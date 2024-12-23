@@ -25,7 +25,8 @@ elseif (alpha <= 0 || alpha >= 1)
 end
 
 % -------------------------------------------------------------------------
-% Check if the user wants to plot the test statistic.
+% Check if the user wants to plot the test statistic and whether the input
+% is valid.
 % -------------------------------------------------------------------------
 if (nargin == 3)
     TTL.Display = 1;
