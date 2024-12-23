@@ -1,2 +1,2 @@
 # BScThesis
-All the code used in the thesis and the standalone files
+This repository contains all the code used in the thesis. 
