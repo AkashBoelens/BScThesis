@@ -1,6 +1,6 @@
 function FTTS = FTestTwoSided(nu1, nu2, alpha, tstat)
 %FTESTTWOSIDED Visualize a two sided F-test
-%   FTTS = FTestTwoSided(NU, ALPHA, TSTAT) plots the theoretical
+%   FTTS = FTestTwoSided(NU1, NU2, ALPHA, TSTAT) plots the theoretical
 %   F-distribution with NU1 and NU2 degrees of freedom. It calculates the
 %   two critical values corresponding to a two sided F-test with NU1 and
 %   NU2 degrees of freedom at an ALPHA level of significance and plots the

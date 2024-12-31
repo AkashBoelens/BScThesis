@@ -1,5 +1,5 @@
 % -------------------------------------------------------------------------
-% When using  FTest(SIDE, NU1, NU2, ALPHA, TSTAT),
+% When using FTest(SIDE, NU1, NU2, ALPHA, TSTAT),
 %
 % SIDE indicates the side of the hypothesis test. Input for SIDE can be any
 % of the three following:

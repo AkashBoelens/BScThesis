@@ -62,7 +62,7 @@ FTL.CV = icdf('F', alpha, nu1, nu2);
 % the F-distribution and the crititcal value. To display the distribution
 % better in a dynamic way, the right end value of the interval depends on
 % the critical value of a right sided F-test. This is because the critical
-% value of a left sided F-test does not increase as much as the thickness
+% value of a left sided F-test does not increase as much as the length
 % of the right sided tail of the F-distribution when the degrees of freedom
 % increase.
 % -------------------------------------------------------------------------
