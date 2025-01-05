@@ -50,12 +50,11 @@ CSTTS.CVright = icdf('Chisquare', 1-alpha/2, nu);
 % -------------------------------------------------------------------------
 % Determining the length of the horizontal axis, which depends on the
 % critical value as having a large degrees of freedom can result in a large
-% critical value. In most cases, using a 2.5 multiplier based on the
-% critical value in the right tail results in a good interval to display
-% the Chi-square distribution and the crititcal value.
+% critical value. This has been done by setting the right end value of the
+% interval to the value of the 99.99th percentile observation.
 % -------------------------------------------------------------------------
 CSTTS.xmin = 0;
-CSTTS.xmax = CSTTS.CVright*2.5;
+CSTTS.xmax = icdf('Chisquare', 0.9999, nu);
 CSTTS.x = CSTTS.xmin:0.01:CSTTS.xmax;
 
 % -------------------------------------------------------------------------

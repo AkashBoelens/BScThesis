@@ -43,12 +43,14 @@ TTTS.CVright = TTTS.CV;
 % -------------------------------------------------------------------------
 % Determining the length of the horizontal axis, which depends on the
 % critical values as having only one or two degrees of freedom can result
-% in large critical values. In most cases however, the critical values are
-% relatively small and [-5, 5] is a good interval to display the curve of 
-% the student's t-distribution and the crititcal values.
+% in large critical values. In most cases, the 0.01th percentile
+% observation value for the left and and the 99.99th percentile observation
+% value gives a good plot interval. When the degrees of freedom is very low
+% (less than four), [min(TTTS.CVleft, -10), max(TTTS.CVright, 10)] results
+% in an interval that allows the distribution to have visible tails.
 % -------------------------------------------------------------------------
-TTTS.xmin = min([TTTS.CVleft-1 -5]);
-TTTS.xmax = max([TTTS.CVright+1 5]);
+TTTS.xmin = min(TTTS.CVleft, max(-10, icdf('T', 0.0001, nu)));
+TTTS.xmax = max(TTTS.CVright, min(10, icdf('T', 0.9999, nu)));
 TTTS.x = TTTS.xmin:0.01:TTTS.xmax;
 
 % -------------------------------------------------------------------------
@@ -139,7 +141,9 @@ TTTS.arright.EdgeColor = 'none';
 % shaded areas representing the p value will be added to the plot. Else,
 % the null can be rejected and a purple vertical dotted line corresponding
 % to the value of the test statistic and dark purple shaded areas
-% displaying the p value will be plotted.
+% displaying the p value will be plotted. The line will always be plotted,
+% the corresponding area will only be shaded if it is contained in the
+% interval of the plot.
 %
 % Afterwards the subtitle will be updated and the code has finished 
 % running.
@@ -165,20 +169,22 @@ if (TTTS.Display == 1)
     else
         xline(tstat, 'LineStyle', ':', 'Color','#8a22b3', 'LineWidth', ...
             1.4);
-        TTTS.tintleft = TTTS.xmin:0.001:-abs(tstat);
-        TTTS.tintright = abs(tstat):0.001:TTTS.xmax;
-            
-        TTTS.tyl = pdf('T', TTTS.tintleft, nu);
-        TTTS.tlar = area(TTTS.tintleft, TTTS.tyl);
-        TTTS.tlar.FaceColor = '#8a22b3';
-        TTTS.tlar.FaceAlpha = 1;
-        TTTS.tlar.EdgeColor = 'none';
+        if all([tstat > TTTS.xmin tstat< TTTS.xmax])
+            TTTS.tintleft = TTTS.xmin:0.001:-abs(tstat);
+            TTTS.tintright = abs(tstat):0.001:TTTS.xmax;
 
-        TTTS.tyr = pdf('T', TTTS.tintright, nu);
-        TTTS.trar = area(TTTS.tintright, TTTS.tyr);
-        TTTS.trar.FaceColor = '#8a22b3';
-        TTTS.trar.FaceAlpha = 1;
-        TTTS.trar.EdgeColor = 'none';
+            TTTS.tyl = pdf('T', TTTS.tintleft, nu);
+            TTTS.tlar = area(TTTS.tintleft, TTTS.tyl);
+            TTTS.tlar.FaceColor = '#8a22b3';
+            TTTS.tlar.FaceAlpha = 1;
+            TTTS.tlar.EdgeColor = 'none';
+
+            TTTS.tyr = pdf('T', TTTS.tintright, nu);
+            TTTS.trar = area(TTTS.tintright, TTTS.tyr);
+            TTTS.trar.FaceColor = '#8a22b3';
+            TTTS.trar.FaceAlpha = 1;
+            TTTS.trar.EdgeColor = 'none';
+        end
     end
     TTTS.pval = 2*cdf('T', -abs(tstat), nu);
     TTTS.empdec = sprintf('%%.%df', 4);

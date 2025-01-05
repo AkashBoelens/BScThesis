@@ -57,12 +57,11 @@ FTR.CV = icdf('F', 1-alpha, nu1, nu2);
 % -------------------------------------------------------------------------
 % Determining the length of the horizontal axis, which depends on the
 % critical value as having only one or two degrees of freedom can result in
-% large critical value. In most cases however, the critical value is
-% relatively small and [0, 9] is a good interval to display the curve of
-% the F-distribution and the crititcal value.
+% large critical value. This has been done by setting the right end value
+% of the interval to the value of the 99.99th percentile observation.
 % -------------------------------------------------------------------------
 FTR.xmin = 0;
-FTR.xmax = max([FTR.CV+3 9]);
+FTR.xmax = icdf('F', 0.9999, nu1, nu2);
 FTR.x = FTR.xmin:0.01:FTR.xmax;
 
 % -------------------------------------------------------------------------
@@ -108,7 +107,7 @@ FTR.y0 = (FTR.mheight - FTR.gheight - 84)*0.5;
 
 figure
 plot(FTR.x,FTR.y,'-black');
-xticks([FTR.CV]);
+xticks(FTR.CV);
 title("F-distribution")
 subtitle({FTR.variables}, 'Interpreter', 'tex');
 xlabel("F-value");
@@ -145,7 +144,8 @@ FTR.ar.EdgeColor = 'none';
 % the p value will be added to the plot. Else, the null can be rejected and
 % a purple vertical dotted line corresponding to the value of the test
 % statistic and a dark purple shaded area displaying the p value will be
-% plotted.
+% plotted. The line will always be plotted, the corresponding area will
+% only be shaded if it is contained in the interval of the plot.
 %
 % Afterwards the subtitle will be updated and the code has finished 
 % running.
@@ -163,12 +163,14 @@ if (FTR.Display == 1)
     else
         xline(tstat, 'LineStyle', ':', 'Color','#8a22b3', 'LineWidth', ...
             1.4);
-        FTR.tint = tstat:0.001:FTR.xmax;
-        FTR.ty = pdf('F', FTR.tint, nu1, nu2);
-        FTR.tar = area(FTR.tint, FTR.ty);
-        FTR.tar.FaceColor = '#8a22b3';
-        FTR.tar.FaceAlpha = 1;
-        FTR.tar.EdgeColor = 'none';
+        if (tstat < FTR.xmax)
+            FTR.tint = tstat:0.001:FTR.xmax;
+            FTR.ty = pdf('F', FTR.tint, nu1, nu2);
+            FTR.tar = area(FTR.tint, FTR.ty);
+            FTR.tar.FaceColor = '#8a22b3';
+            FTR.tar.FaceAlpha = 1;
+            FTR.tar.EdgeColor = 'none';
+        end
     end
     FTR.pval = 1-cdf('F', tstat, nu1, nu2);
     FTR.empdec = sprintf('%%.%df', 4);

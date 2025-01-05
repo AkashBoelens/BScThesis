@@ -49,13 +49,11 @@ CSTL.CV = icdf('Chisquare', alpha, nu);
 % -------------------------------------------------------------------------
 % Determining the length of the horizontal axis, which depends on the
 % critical value as having a large degrees of freedom can result in a large
-% critical value. To display the distribution better in a dynamic way, the
-% right end value of the interval depends on a multiplier based on the
-% critical value of a right sided Chi-squared test.
+% critical value. This has been done by setting the right end value of the
+% interval to the value of the 99.99th percentile observation.
 % -------------------------------------------------------------------------
-CSTL.betterright = icdf('Chisquare', 1-alpha, nu);
 CSTL.xmin = 0;
-CSTL.xmax = CSTL.betterright*2.5;
+CSTL.xmax = icdf('Chisquare', 0.9999, nu);
 CSTL.x = CSTL.xmin:0.01:CSTL.xmax;
 
 % -------------------------------------------------------------------------
@@ -101,7 +99,7 @@ CSTL.y0 = (CSTL.mheight - CSTL.gheight - 84)*0.5;
 
 figure
 plot(CSTL.x,CSTL.y,'-black');
-xticks([CSTL.CV]);
+xticks(CSTL.CV);
 title("Chi-square distribution");
 subtitle({CSTL.variables}, 'Interpreter', 'tex');
 xlabel("Chi-square value");

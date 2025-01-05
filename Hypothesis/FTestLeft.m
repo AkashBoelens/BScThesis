@@ -57,18 +57,11 @@ FTL.CV = icdf('F', alpha, nu1, nu2);
 % -------------------------------------------------------------------------
 % Determining the length of the horizontal axis, which depends on the
 % critical value as having only one or two degrees of freedom can result in
-% large critical value. In most cases however, the critical value is
-% relatively small and [0, 9] is a good interval to display the curve of
-% the F-distribution and the crititcal value. To display the distribution
-% better in a dynamic way, the right end value of the interval depends on
-% the critical value of a right sided F-test. This is because the critical
-% value of a left sided F-test does not increase as much as the length
-% of the right sided tail of the F-distribution when the degrees of freedom
-% increase.
+% large critical value. This has been done by setting the right end value
+% of the interval to the value of the 99.99th percentile observation.
 % -------------------------------------------------------------------------
-FTL.betterright = icdf('F', 1-alpha, nu2, nu1);
 FTL.xmin = 0;
-FTL.xmax = min([FTL.betterright+3 9]);
+FTL.xmax = icdf('F', 0.9999, nu1, nu2);
 FTL.x = FTL.xmin:0.01:FTL.xmax;
 
 % -------------------------------------------------------------------------
@@ -114,7 +107,7 @@ FTL.y0 = (FTL.mheight - FTL.gheight - 84)*0.5;
 
 figure
 plot(FTL.x,FTL.y,'-black');
-xticks([FTL.CV]);
+xticks(FTL.CV);
 title("F-distribution");
 subtitle({FTL.variables}, 'Interpreter', 'tex');
 xlabel("F-value");
@@ -151,7 +144,7 @@ FTL.ar.EdgeColor = 'none';
 % the p value will be added to the plot. Else, the null can be rejected and
 % a purple vertical dotted line corresponding to the value of the test
 % statistic and a dark purple shaded area displaying the p value will be
-% plotted.
+% plotted. 
 %
 % Afterwards the subtitle will be updated and the code has finished 
 % running.

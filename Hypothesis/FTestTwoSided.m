@@ -58,12 +58,11 @@ FTTS.CVright = icdf('F', 1-alpha/2, nu1, nu2);
 % -------------------------------------------------------------------------
 % Determining the length of the horizontal axis, which depends on the
 % critical values as having only one or two degrees of freedom can result
-% in large critical value. In most cases however, the critical values are
-% relatively small and [0, 9] is a good interval to display the curve of
-% the F-distribution and the crititcal values.
+% in large critical value. This has been done by setting the right end
+% value of the interval to the value of the 99.99th percentile observation.
 % -------------------------------------------------------------------------
 FTTS.xmin = 0;
-FTTS.xmax = min([FTTS.CVright+3 9]);
+FTTS.xmax = icdf('F', 0.9999, nu1, nu2);
 FTTS.x = FTTS.xmin:0.01:FTTS.xmax;
 
 % -------------------------------------------------------------------------
@@ -155,7 +154,9 @@ FTTS.arright.EdgeColor = 'none';
 % shaded areas representing the p value will be added to the plot. Else,
 % the null can be rejected and a purple vertical dotted line corresponding
 % to the value of the test statistic and dark purple shaded areas
-% displaying the p value will be plotted.
+% displaying the p value will be plotted. The line will always be plotted,
+% the corresponding area will only be shaded if it is contained in the
+% interval of the plot.
 %
 % Afterwards the subtitle is updated and the code has finished running.
 % -------------------------------------------------------------------------
@@ -206,17 +207,19 @@ if (FTTS.Display == 1)
             FTTS.tintright = FTTS.otherstat:0.001:FTTS.xmax;
             FTTS.pval = 2*cdf('F', tstat, nu1, nu2);
         end
-        FTTS.tyl = pdf('F', FTTS.tintleft, nu1, nu2);
-        FTTS.tlar = area(FTTS.tintleft, FTTS.tyl);
-        FTTS.tlar.FaceColor = '#8a22b3';
-        FTTS.tlar.FaceAlpha = 1;
-        FTTS.tlar.EdgeColor = 'none';
+        if (tstat < FTTS.xmax)
+            FTTS.tyl = pdf('F', FTTS.tintleft, nu1, nu2);
+            FTTS.tlar = area(FTTS.tintleft, FTTS.tyl);
+            FTTS.tlar.FaceColor = '#8a22b3';
+            FTTS.tlar.FaceAlpha = 1;
+            FTTS.tlar.EdgeColor = 'none';
 
-        FTTS.tyr = pdf('F', FTTS.tintright, nu1, nu2);
-        FTTS.trar = area(FTTS.tintright, FTTS.tyr);
-        FTTS.trar.FaceColor = '#8a22b3';
-        FTTS.trar.FaceAlpha = 1;
-        FTTS.trar.EdgeColor = 'none';
+            FTTS.tyr = pdf('F', FTTS.tintright, nu1, nu2);
+            FTTS.trar = area(FTTS.tintright, FTTS.tyr);
+            FTTS.trar.FaceColor = '#8a22b3';
+            FTTS.trar.FaceAlpha = 1;
+            FTTS.trar.EdgeColor = 'none';
+        end
     end
     FTTS.empdec = sprintf('%%.%df', 4);
     FTTS.pdec = sprintf('%%.%df', 4);

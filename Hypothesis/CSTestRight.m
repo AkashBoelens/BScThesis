@@ -49,11 +49,11 @@ CSTR.CV = icdf('Chisquare', 1-alpha, nu);
 % -------------------------------------------------------------------------
 % Determining the length of the horizontal axis, which depends on the
 % critical value as having a large degrees of freedom can result in a large
-% critical value. In most cases, using a 2.5 multiplier results in a good
-% interval to display the Chi-square distribution and the crititcal value.
+% critical value. This has been done by setting the right end value of the
+% interval to the value of the 99.99th percentile observation.
 % -------------------------------------------------------------------------
 CSTR.xmin = 0;
-CSTR.xmax = CSTR.CV*2.5;
+CSTR.xmax = icdf('Chisquare', 0.9999, nu);
 CSTR.x = CSTR.xmin:0.01:CSTR.xmax;
 
 % -------------------------------------------------------------------------
@@ -99,7 +99,7 @@ CSTR.y0 = (CSTR.mheight - CSTR.gheight - 84)*0.5;
 
 figure
 plot(CSTR.x,CSTR.y,'-black');
-xticks([CSTR.CV]);
+xticks(CSTR.CV);
 title("Chi-squared distribution")
 subtitle({CSTR.variables}, 'Interpreter', 'tex');
 xlabel("Chi-square value");
@@ -136,7 +136,8 @@ CSTR.ar.EdgeColor = 'none';
 % the p value will be added to the plot. Else, the null can be rejected and
 % a purple vertical dotted line corresponding to the value of the test
 % statistic and a dark purple shaded area displaying the p value will be
-% plotted.
+% plotted. The line will always be plotted, the corresponding area will
+% only be shaded if it is contained in the interval of the plot.
 %
 % Afterwards the subtitle will be updated and the code has finished 
 % running.
@@ -154,12 +155,14 @@ if (CSTR.Display == 1)
     else
         xline(tstat, 'LineStyle', ':', 'Color','#8a22b3', 'LineWidth', ...
             1.4);
-        CSTR.tint = tstat:0.001:CSTR.xmax;
-        CSTR.ty = pdf('Chisquare', CSTR.tint, nu);
-        CSTR.tar = area(CSTR.tint, CSTR.ty);
-        CSTR.tar.FaceColor = '#8a22b3';
-        CSTR.tar.FaceAlpha = 1;
-        CSTR.tar.EdgeColor = 'none';
+        if (tstat < CSTR.xmax)
+            CSTR.tint = tstat:0.001:CSTR.xmax;
+            CSTR.ty = pdf('Chisquare', CSTR.tint, nu);
+            CSTR.tar = area(CSTR.tint, CSTR.ty);
+            CSTR.tar.FaceColor = '#8a22b3';
+            CSTR.tar.FaceAlpha = 1;
+            CSTR.tar.EdgeColor = 'none';
+        end
     end
     CSTR.pval = 1-cdf('Chisquare', tstat, nu);
     CSTR.empdec = sprintf('%%.%df', 4);

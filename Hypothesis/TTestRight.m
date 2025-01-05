@@ -48,13 +48,14 @@ TTR.CV = icdf('T', 1-alpha, nu);
 % -------------------------------------------------------------------------
 % Determining the length of the horizontal axis, which depends on the
 % critical value as having only one or two degrees of freedom can result in
-% a large critical value. In most cases however, the critical value is
-% relatively small and [-5, 5] is a good interval to display the curve of
-% the student's t-distribution and the crititcal value. xmin uses -TTR.CV
-% as the critical value is positive by construction.
+% a large critical value. In most cases, the 0.01th percentile observation
+% value for the left and and the 99.99th percentile observation value gives
+% a good plot interval. When the degrees of freedom is very low (less than
+% four), [min(-TTR.CV, -10), max(TTR.CV, 10)] results in an interval that
+% allows the distribution to have visible tails.
 % -------------------------------------------------------------------------
-TTR.xmin = min([-TTR.CV-1 -5]);
-TTR.xmax = max([TTR.CV+1 5]);
+TTR.xmin = min(-TTR.CV, max(-10, icdf('T', 0.0001, nu)));
+TTR.xmax = max(TTR.CV, min(10, icdf('T', 0.9999, nu)));
 TTR.x = TTR.xmin:0.01:TTR.xmax;
 
 % -------------------------------------------------------------------------
@@ -100,7 +101,7 @@ TTR.y0 = (TTR.mheight - TTR.gheight - 84)*0.5;
 
 figure
 plot(TTR.x,TTR.y,'-black');
-xticks([0 TTR.CV]);
+xticks([min(0, TTR.CV) max(0, TTR.CV)]);
 title("t-distribution");
 subtitle({TTR.variables}, 'Interpreter', 'tex');
 xlabel("t-value");
@@ -137,7 +138,8 @@ TTR.ar.EdgeColor = 'none';
 % the p value will be added to the plot. Else, the null can be rejected and
 % a purple vertical dotted line corresponding to the value of the test
 % statistic and a dark purple shaded area displaying the p value will be
-% plotted.
+% plotted. The line will always be plotted, the corresponding area will
+% only be shaded if it is contained in the interval of the plot.
 %
 % Afterwards the subtitle will be updated and the code has finished 
 % running.
@@ -155,12 +157,14 @@ if (TTR.Display == 1)
     else
         xline(tstat, 'LineStyle', ':', 'Color','#8a22b3', 'LineWidth', ...
             1.4);
-        TTR.tint = tstat:0.001:TTR.xmax;        
-        TTR.ty = pdf('T', TTR.tint, nu);
-        TTR.tar = area(TTR.tint, TTR.ty);
-        TTR.tar.FaceColor = '#8a22b3';
-        TTR.tar.FaceAlpha = 1;
-        TTR.tar.EdgeColor = 'none';
+        if (tstat < TTR.xmax)
+            TTR.tint = tstat:0.001:TTR.xmax;
+            TTR.ty = pdf('T', TTR.tint, nu);
+            TTR.tar = area(TTR.tint, TTR.ty);
+            TTR.tar.FaceColor = '#8a22b3';
+            TTR.tar.FaceAlpha = 1;
+            TTR.tar.EdgeColor = 'none';
+        end
     end
     TTR.pval = 1-cdf('T', tstat, nu);
     TTR.empdec = sprintf('%%.%df', 4);
